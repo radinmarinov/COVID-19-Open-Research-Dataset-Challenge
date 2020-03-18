@@ -133,7 +133,7 @@ class ResearchFinder():
         return self.citation_dict
     
     def summarize_paper(self, paper):
-        api_key = 'A9BF13D6B0'
+        api_key = ''
         url = 'https://api.smmry.com'
         data = self.get_data()
         text = data.loc[data['paper_id'] == paper, 'init_body_text'][0]
