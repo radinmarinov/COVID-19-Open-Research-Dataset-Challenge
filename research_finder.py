@@ -144,7 +144,9 @@ class ResearchFinder():
             self.data.drop_duplicates(['abstract'], inplace=True)
             for stopword in stopwords.words("english"):
                 self.vocab.pop(stopword, None)
-                
+            for k in list(self.vocab.keys()):
+                if len(k) < 2:
+                    self.vocab.pop(k)
         return self.data
     
     def find_paper(self, keywords):
