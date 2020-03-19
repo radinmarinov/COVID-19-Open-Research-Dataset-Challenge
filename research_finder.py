@@ -132,7 +132,7 @@ class ResearchFinder():
         data = self.get_data()
         score = pd.Series(0, index=data.index)
         for keyword in keywords:
-            inv_freq = (len(self.vocab) / self.vocab.get(keyword, 1))
+            inv_freq = (sum(self.vocab.values()) / sum([self.vocab.get(k) for k in [k for k in self.vocab.keys() if keyword in k]]))
             score += 10 * data['title'].str.count(keyword) *  inv_freq\
                     + 5 * data['abstract'].str.count(keyword) * inv_freq\
                     + 1 * data['body_text'].str.count(keyword) * inv_freq
@@ -140,7 +140,7 @@ class ResearchFinder():
         data['score'] = score
         citation_dict = self.get_citation_dict()
         data['importance'] = pd.Series([citation_dict.get(x) for x in data['title']])
-        return data[0:1000]
+        return data[0:100]
     
     def get_citation_dict(self):
         if self.citation_dict is None:
@@ -211,7 +211,8 @@ class ResearchFinder():
 if __name__ == '__main__':
     rf = ResearchFinder()
     #data = rf.get_data()
-    test_papers = rf.find_paper(['coronavirus', 'smoke'])
+    data = rf.get_data()
+    test_papers = rf.find_paper(['coronavirus', 'smok'])
     citation_dict = rf.get_citation_dict()
     summary = rf.summarize_paper(test_papers['init_body_text'].iloc[0], 7)
-    print(summary)
+    best_title = test_papers['init_title'].iloc[0]
