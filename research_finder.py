@@ -28,6 +28,10 @@ class ResearchFinder():
         self.all_jsons = None
         self.data = None
         self.citation_dict = None
+        self.vocab = {}
+        
+    def add_to_vocab(self, word):
+        self.vocab[word] = self.vocab.get(word, 0) + 1
         
     def json_parser(self, file_path):
         """
@@ -40,6 +44,9 @@ class ResearchFinder():
             parsed_data['init_title'] = data['metadata']['title']
             parsed_data['title'] = re.sub('[^a-zA-z0-9\s]',' ',data['metadata']['title']).lower()
             
+            for word in parsed_data['title'].split(" "):
+                self.add_to_vocab(word)
+            
             abstract = []
             body_text = []
             bib_entries = []
@@ -49,10 +56,16 @@ class ResearchFinder():
             
             for paragraph in data['abstract']:
                 init_abstract.append(paragraph['text'])
-                abstract.append(re.sub('[^a-zA-z0-9\s]',' ',paragraph['text']).lower())
+                text = re.sub('[^a-zA-z0-9\s]',' ',paragraph['text']).lower()
+                abstract.append(text)
+                for word in text:
+                    self.add_to_vocab(word)
             for paragraph in data['body_text']:
                 init_body_text.append(paragraph['text'])
-                body_text.append(re.sub('[^a-zA-z0-9\s]',' ',paragraph['text']).lower())
+                text = re.sub('[^a-zA-z0-9\s]',' ',paragraph['text']).lower()
+                body_text.append(text)
+                for word in text:
+                    self.add_to_vocab(word)
             for citation in data['bib_entries'].values():
                 title = re.sub('[^a-zA-z0-9\s]',' ',citation['title'])
                 title = title.lower()
@@ -91,8 +104,8 @@ class ResearchFinder():
                         
                         }
             for i, file_path in enumerate(self.all_jsons):
-                if i % (len(self.all_jsons) // 10) == 0:
-                    print(f'Processing index: {i} of {len(self.all_jsons)}')
+                #if i % (len(self.all_jsons) // 10) == 0:
+                #    print(f'Processing index: {i} of {len(self.all_jsons)}')
                 paper_data = self.json_parser(file_path)
                 data_dict['paper_id'].append(paper_data['paper_id'])
                 data_dict['title'].append(paper_data['title'])
@@ -118,9 +131,10 @@ class ResearchFinder():
         data = self.get_data()
         score = pd.Series(0, index=data.index)
         for keyword in keywords:
-            score += 10 * data['title'].str.contains(keyword) \
-                    + 5 * data['abstract'].str.contains(keyword) \
-                    + 1 * data['body_text'].str.contains(keyword) 
+            inv_freq = (len(self.vocab) / self.vocab.get(keyword, 1))
+            score += 10 * data['title'].str.count(keyword) *  inv_freq\
+                    + 5 * data['abstract'].str.count(keyword) * inv_freq\
+                    + 1 * data['body_text'].str.count(keyword) * inv_freq
         data = data.reindex(score.sort_values(ascending=False).index)
         data['score'] = score
         citation_dict = self.get_citation_dict()
@@ -196,6 +210,6 @@ class ResearchFinder():
 if __name__ == '__main__':
     rf = ResearchFinder()
     data = rf.get_data()
-    test_papers = rf.find_paper(['coronavirus', 'smok'])
+    test_papers = rf.find_paper(['coronavirus', 'smoke'])
     citation_dict = rf.get_citation_dict()
     summary = rf.summarize_paper(test_papers['init_body_text'].iloc[0], 7)
