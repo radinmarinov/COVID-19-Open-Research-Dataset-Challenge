@@ -24,13 +24,14 @@ class ResearchFinder():
     Will also return a summary of an paper
     """
     
-    def __init__(self, all_metadata=None, all_jsons=None, data=None, citation_dict=None, vocab={}):
+    def __init__(self, all_metadata=None, all_jsons=None, data=None, citation_dict=None, vocab={}, sentence_similarity_dict={}):
         self.all_metadata = all_metadata
         self.all_jsons = all_jsons
         self.data = data
         self.citation_dict = citation_dict
         self.vocab = vocab
-      
+        self.sentence_similarity_dict = sentence_similarity_dict
+        
     def store_data(self):
         research_finder_file = open('research_finder_file', 'ab') 
       
@@ -177,12 +178,21 @@ class ResearchFinder():
         return self.citation_dict
     
     def summarize_paper(self, paper_text, n_sentences):
-        
+        self.sentence_similarity_dict = {}
         tokens = nltk.tokenize.sent_tokenize(paper_text)
         sentences = []
         for sentence in tokens:
             sentences.append(sentence.replace("[^a-zA-Z]", " ").split(" "))
         stop_words = stopwords.words("english")
+        custom_stop_words = [
+                            'doi', 'preprint', 'copyright', 'peer', 'reviewed',
+                            'org', 'https', 'et', 'al', 'author', 'figure', 
+                            'rights', 'reserved', 'permission', 'used', 'using',
+                            'biorxiv', 'fig', 'fig.', 'al.', 'di', 'la', 'il', 
+                            'del', 'le', 'della', 'dei', 'delle', 'una', 'da', 
+                            'dell',  'non', 'si'
+                            ]
+        stop_words.extend(custom_stop_words)
         summarize_text = []
         # Step 2 - Generate Similary Martix across sentences
         sentence_similarity_martix = self.build_similarity_matrix(sentences, stop_words)
@@ -199,23 +209,32 @@ class ResearchFinder():
         return "\n".join(summarize_text)
     
     def sentence_similarity(self, sent1, sent2, stopwords_=None):    
-        if stopwords_ is None:        
-            stopwords_ = []     
-        sent1 = [w.lower() for w in sent1]    
-        sent2 = [w.lower() for w in sent2]     
-        all_words = list(set(sent1 + sent2))    
-        vector1 = [0] * len(all_words)    
-        vector2 = [0] * len(all_words)     
-        # build the vector for the first sentence   
-        for w in sent1:       
-            if w in stopwords_:            
-                continue        
-            vector1[all_words.index(w)] += 1     
-        # build the vector for the second sentence    
-        for w in sent2:        
-            if w in stopwords_:           
-                continue        
-            vector2[all_words.index(w)] += 1     
+        vectors = self.sentence_similarity_dict.get(tuple(sent1 + sent2), None)
+        
+        if vectors is not None:
+            vector1 = vectors[0]
+            vector2 = vectors[1]
+            
+        else:
+            if stopwords_ is None:        
+                stopwords_ = []     
+            sent1_new = [w.lower() for w in sent1]    
+            sent2_new = [w.lower() for w in sent2]     
+            all_words = list(set(sent1_new + sent2_new))    
+            vector1 = [0] * len(all_words)    
+            vector2 = [0] * len(all_words)     
+            # build the vector for the first sentence   
+            for w in sent1_new:       
+                if w in stopwords_:            
+                    continue        
+                vector1[all_words.index(w)] += 1     
+            # build the vector for the second sentence    
+            for w in sent2_new:        
+                if w in stopwords_:           
+                    continue        
+                vector2[all_words.index(w)] += 1     
+            self.sentence_similarity_dict[tuple(sent1 + sent2)] = (vector1, vector2)
+            self.sentence_similarity_dict[tuple(sent2 + sent1)] = (vector2, vector1)
         
         return 1 - cosine_distance(vector1, vector2)
     
@@ -235,11 +254,11 @@ class ResearchFinder():
 if __name__ == '__main__':
     from research_finder import ResearchFinder
     rf = ResearchFinder()
-#    rf.load_data()
-    data = rf.get_data()
-    citation_dict = rf.get_citation_dict()
-    rf.store_data()
+    rf.load_data()
+#    data = rf.get_data()
+#    citation_dict = rf.get_citation_dict()
+#    rf.store_data()
     test_papers = rf.find_paper(['coronavirus', 'risk', 'factor', 'covid'])
     best_title = test_papers['init_title'].iloc[0]
-#    summary = rf.summarize_paper(test_papers['init_body_text'].iloc[0], 7)
+    summary = rf.summarize_paper(test_papers['init_body_text'].iloc[0], 7)
     
