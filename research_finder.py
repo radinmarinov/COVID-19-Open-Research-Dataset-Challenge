@@ -45,7 +45,7 @@ class ResearchFinder():
         self.all_jsons = research_finder_object.all_jsons
         self.data = research_finder_object.data
         self.citation_dict = research_finder_object.citation_dict
-        self.vocab = research_finder_object.vocab
+#        self.vocab = research_finder_object.vocab
         research_finder_file.close() 
             
     def add_to_vocab(self, word):
@@ -62,8 +62,8 @@ class ResearchFinder():
             parsed_data['init_title'] = data['metadata']['title']
             parsed_data['title'] = re.sub('[^a-zA-z0-9\s]',' ',data['metadata']['title']).lower()
             
-            for word in parsed_data['title'].split(" "):
-                self.add_to_vocab(word)
+#            for word in parsed_data['title'].split(" "):
+#                self.add_to_vocab(word)
             
             abstract = []
             body_text = []
@@ -76,14 +76,14 @@ class ResearchFinder():
                 init_abstract.append(paragraph['text'])
                 text = re.sub('[^a-zA-z0-9\s]',' ',paragraph['text']).lower()
                 abstract.append(text)
-                for word in text:
-                    self.add_to_vocab(word)
+#                for word in text.split(" "):
+#                    self.add_to_vocab(word)
             for paragraph in data['body_text']:
                 init_body_text.append(paragraph['text'])
                 text = re.sub('[^a-zA-z0-9\s]',' ',paragraph['text']).lower()
                 body_text.append(text)
-                for word in text:
-                    self.add_to_vocab(word)
+#                for word in text.split(" "):
+#                    self.add_to_vocab(word)
             for citation in data['bib_entries'].values():
                 title = re.sub('[^a-zA-z0-9\s]',' ',citation['title'])
                 title = title.lower()
@@ -142,11 +142,11 @@ class ResearchFinder():
                                                          'init_abstract', 
                                                          'init_body_text'])
             self.data.drop_duplicates(['abstract'], inplace=True)
-            for stopword in stopwords.words("english"):
-                self.vocab.pop(stopword, None)
-            for k in list(self.vocab.keys()):
-                if len(k) < 2:
-                    self.vocab.pop(k)
+#            for stopword in stopwords.words("english"):
+#                self.vocab.pop(stopword, None)
+#            for k in list(self.vocab.keys()):
+#                if len(k) < 2:
+#                    self.vocab.pop(k)
         return self.data
     
     def find_paper(self, keywords):
@@ -235,11 +235,11 @@ class ResearchFinder():
 if __name__ == '__main__':
     from research_finder import ResearchFinder
     rf = ResearchFinder()
-    rf.load_data()
-#    data = rf.get_data()
-#    citation_dict = rf.get_citation_dict()
-#    rf.store_data()
+#    rf.load_data()
+    data = rf.get_data()
+    citation_dict = rf.get_citation_dict()
+    rf.store_data()
     test_papers = rf.find_paper(['coronavirus', 'risk', 'factor', 'covid'])
     best_title = test_papers['init_title'].iloc[0]
-    summary = rf.summarize_paper(test_papers['init_body_text'].iloc[0], 7)
+#    summary = rf.summarize_paper(test_papers['init_body_text'].iloc[0], 7)
     
