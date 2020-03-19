@@ -15,7 +15,7 @@ from nltk.cluster.util import cosine_distance
 from nltk.corpus import stopwords
 import numpy as np
 import networkx as nx
-import copy
+
 
 class ResearchFinder():
     """
@@ -142,17 +142,22 @@ class ResearchFinder():
                                                          'init_abstract', 
                                                          'init_body_text'])
             self.data.drop_duplicates(['abstract'], inplace=True)
-            
+            for stopword in stopwords.words("english"):
+                self.vocab.pop(stopword, None)
+                
         return self.data
     
     def find_paper(self, keywords):
         data = self.get_data()
         score = pd.Series(0, index=data.index)
         for keyword in keywords:
-            inv_freq = (sum(self.vocab.values()) / (sum([self.vocab.get(k) for k in [k for k in self.vocab.keys() if keyword in k]]) + 1))
-            score += 10 * data['title'].str.count(keyword) *  inv_freq\
-                    + 5 * data['abstract'].str.count(keyword) * inv_freq\
-                    + 1 * data['body_text'].str.count(keyword) * inv_freq
+            tf = np.log(1 + data['title'].str.count(keyword) \
+                            + data['abstract'].str.count(keyword) \
+                            + data['body_text'].str.count(keyword))
+            idf = np.log((len(data.index)) / (1 + (1 * data['title'].str.contains(keyword) \
+                                                + 1 * data['abstract'].str.contains(keyword) \
+                                                + 1 * data['body_text'].str.contains(keyword))) )
+            score += tf * idf
         data = data.reindex(score.sort_values(ascending=False).index)
         data['score'] = score
         citation_dict = self.get_citation_dict()
@@ -228,11 +233,11 @@ class ResearchFinder():
 if __name__ == '__main__':
     from research_finder import ResearchFinder
     rf = ResearchFinder()
-#    rf.load_data()
-    data = rf.get_data()
-    citation_dict = rf.get_citation_dict()
-    rf.store_data()
-#    test_papers = rf.find_paper(['coronavirus', 'smok'])
-#    best_title = test_papers['init_title'].iloc[0]
-#    summary = rf.summarize_paper(test_papers['init_body_text'].iloc[0], 7)
+    rf.load_data()
+#    data = rf.get_data()
+#    citation_dict = rf.get_citation_dict()
+#    rf.store_data()
+    test_papers = rf.find_paper(['coronavirus', 'risk', 'factor', 'covid'])
+    best_title = test_papers['init_title'].iloc[0]
+    summary = rf.summarize_paper(test_papers['init_body_text'].iloc[0], 7)
     
