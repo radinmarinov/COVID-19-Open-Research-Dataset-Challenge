@@ -9,7 +9,7 @@ import pandas as pd
 import json
 import glob
 import re
-import requests
+import pickle
 import nltk
 from nltk.cluster.util import cosine_distance
 from nltk.corpus import stopwords
@@ -24,13 +24,30 @@ class ResearchFinder():
     Will also return a summary of an paper
     """
     
-    def __init__(self):
-        self.all_metadata = None
-        self.all_jsons = None
-        self.data = None
-        self.citation_dict = None
-        self.vocab = {}
+    def __init__(self, all_metadata=None, all_jsons=None, data=None, citation_dict=None, vocab={}):
+        self.all_metadata = all_metadata
+        self.all_jsons = all_jsons
+        self.data = data
+        self.citation_dict = citation_dict
+        self.vocab = vocab
+      
+    def store_data(self):
+        research_finder_file = open('research_finder_file', 'ab') 
+      
+        # source, destination 
+        pickle.dump(self, research_finder_file)                      
+        research_finder_file.close() 
         
+    def load_data(self):
+        research_finder_file = open('research_finder_file', 'rb')      
+        research_finder_object = pickle.load(research_finder_file) 
+        self.all_metadata = research_finder_object.all_metadata
+        self.all_jsons = research_finder_object.all_jsons
+        self.data = research_finder_object.data
+        self.citation_dict = research_finder_object.citation_dict
+        self.vocab = research_finder_object.vocab
+        research_finder_file.close() 
+            
     def add_to_vocab(self, word):
         self.vocab[word] = self.vocab.get(word, 0) + 1
         
@@ -132,7 +149,7 @@ class ResearchFinder():
         data = self.get_data()
         score = pd.Series(0, index=data.index)
         for keyword in keywords:
-            inv_freq = (sum(self.vocab.values()) / sum([self.vocab.get(k) for k in [k for k in self.vocab.keys() if keyword in k]]))
+            inv_freq = (sum(self.vocab.values()) / (sum([self.vocab.get(k) for k in [k for k in self.vocab.keys() if keyword in k]]) + 1))
             score += 10 * data['title'].str.count(keyword) *  inv_freq\
                     + 5 * data['abstract'].str.count(keyword) * inv_freq\
                     + 1 * data['body_text'].str.count(keyword) * inv_freq
@@ -212,7 +229,8 @@ if __name__ == '__main__':
     rf = ResearchFinder()
     #data = rf.get_data()
     data = rf.get_data()
-    test_papers = rf.find_paper(['coronavirus', 'smok'])
     citation_dict = rf.get_citation_dict()
-    summary = rf.summarize_paper(test_papers['init_body_text'].iloc[0], 7)
+    rf.store_data()
+    test_papers = rf.find_paper(['coronavirus', 'smok'])
     best_title = test_papers['init_title'].iloc[0]
+    summary = rf.summarize_paper(test_papers['init_body_text'].iloc[0], 7)
