@@ -5,7 +5,7 @@ app = Flask(__name__)
 
 
 rf = ResearchFinder()
-
+rf.load_data()
 @app.route('/')
 def render():
 	return render_template("index.html", search = False, data = [], search_entry = "")

@@ -122,8 +122,8 @@ class ResearchFinder():
                         
                         }
             for i, file_path in enumerate(self.all_jsons):
-                #if i % (len(self.all_jsons) // 10) == 0:
-                #print(f'Processing index: {i} of {len(self.all_jsons)}')
+                if i % (len(self.all_jsons) // 10) == 0:
+                    print(f'Processing index: {i} of {len(self.all_jsons)}')
                 paper_data = self.json_parser(file_path)
                 data_dict['paper_id'].append(paper_data['paper_id'])
                 data_dict['title'].append(paper_data['title'])
@@ -226,11 +226,13 @@ class ResearchFinder():
 
 
 if __name__ == '__main__':
+    from research_finder import ResearchFinder
     rf = ResearchFinder()
-    #data = rf.get_data()
+#    rf.load_data()
     data = rf.get_data()
     citation_dict = rf.get_citation_dict()
     rf.store_data()
-    test_papers = rf.find_paper(['coronavirus', 'smok'])
-    best_title = test_papers['init_title'].iloc[0]
-    summary = rf.summarize_paper(test_papers['init_body_text'].iloc[0], 7)
+#    test_papers = rf.find_paper(['coronavirus', 'smok'])
+#    best_title = test_papers['init_title'].iloc[0]
+#    summary = rf.summarize_paper(test_papers['init_body_text'].iloc[0], 7)
+    
