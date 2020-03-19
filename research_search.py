@@ -17,9 +17,9 @@ def search():
 	papers = rf.find_paper(keywords)
 	formatted_data = []
 	for x in range(0,5):
-		formatted_data.append([papers["init_title"].iloc[x], papers["init_abstract"].iloc[x]])
+		formatted_data.append([papers["init_title"].iloc[x], papers["init_abstract"].iloc[x][0:500] + "..."])
 
-	print(formatted_data)
+	#print(formatted_data)
 
 
 	return render_template("index.html", search = True, data = formatted_data, search_entry = search)
