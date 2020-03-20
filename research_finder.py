@@ -39,8 +39,11 @@ class ResearchFinder():
         pickle.dump(self, research_finder_file)                      
         research_finder_file.close() 
         
-    def load_data(self):
-        research_finder_file = open('research_finder_file', 'rb')      
+    def load_data(self, kaggle=False):
+        if kaggle:
+            research_finder_file = open('../input/research-finder-file/research_finder_file', 'rb')
+        else:
+            research_finder_file = open('research_finder_file', 'rb')      
         research_finder_object = pickle.load(research_finder_file) 
         self.all_metadata = research_finder_object.all_metadata
         self.all_jsons = research_finder_object.all_jsons
@@ -254,7 +257,7 @@ class ResearchFinder():
 if __name__ == '__main__':
     from research_finder import ResearchFinder
     rf = ResearchFinder()
-    rf.load_data()
+    rf.load_data(kaggle=False)
 #    data = rf.get_data()
 #    citation_dict = rf.get_citation_dict()
 #    rf.store_data()
