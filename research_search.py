@@ -11,6 +11,8 @@ ENTRY = ""
 SUMMARY = False
 SUMMARY_TEXT = ""
 PAPERS = []
+PAGE = 0
+ARTICLE = 0
 @app.route('/')
 def render():
 	global SEARCH
@@ -19,13 +21,15 @@ def render():
 	global SUMMARY
 	global ARTICLE
 	global PAPERS
+	global PAGE
+	global ARTICLE
 	SEARCH = False
 	DATA = []
 	ENTRY = ""
 	SUMMARY = False
 	SUMMARY_TEXT = ""
 	PAPERS = []
-	return render_template("index.html", search = SEARCH, data = DATA, search_entry = ENTRY, summary = SUMMARY, summary_text = SUMMARY_TEXT)
+	return render_template("index.html", search = SEARCH, data = DATA, search_entry = ENTRY, summary = SUMMARY, summary_text = SUMMARY_TEXT, page = PAGE)
 
 @app.route('/search', methods=['POST'])
 def search():
@@ -35,17 +39,18 @@ def search():
 	global SUMMARY
 	global ARTICLE
 	global PAPERS
+	global PAGE
+	global ARTICLE
 	SUMMARY = False
 	SEARCH = True
 	ENTRY = request.form['keywords']
 	keywords = ENTRY.split(" ")
 	PAPERS = rf.find_paper(keywords)
 	DATA = []
-	for x in range(0,5):
+	for x in range(0,100):
 		DATA.append([PAPERS["init_title"].iloc[x], "Abstract: " + PAPERS["init_abstract"].iloc[x][0:500] + "..."])
 
-	#print(formatted_data)
-	return render_template("index.html", search = SEARCH, data = DATA, search_entry = ENTRY, summary = SUMMARY, summary_text = SUMMARY_TEXT)
+	return render_template("index.html", article=ARTICLE, search = SEARCH, data = DATA, search_entry = ENTRY, summary = SUMMARY, summary_text = SUMMARY_TEXT, page = PAGE)
 
 
 @app.route('/summary', methods=['POST'])
@@ -56,18 +61,43 @@ def summary():
 	global SUMMARY
 	global ARTICLE
 	global PAPERS
+	global PAGE
+	global ARTICLE
 	SEARCH = True
 	SUMMARY = True
 	ARTICLE = request.form['link']
 	SUMMARY_TEXT = rf.summarize_paper(PAPERS['init_body_text'].iloc[int(ARTICLE)], 7)
-	return render_template("index.html", search = SEARCH, data = DATA, search_entry = ENTRY, summary = SUMMARY, summary_text = SUMMARY_TEXT)
-	# keywords = search.split(" ")
-	# papers = rf.find_paper(keywords)
-	# formatted_data = []
-	# for x in range(0,5):
-	# 	formatted_data.append([papers["init_title"].iloc[x], "Abstract: " + papers["init_abstract"].iloc[x][0:500] + "..."])
 
-	# #print(formatted_data)
+	return render_template("index.html", article=ARTICLE, search = SEARCH, data = DATA, search_entry = ENTRY, summary = SUMMARY, summary_text = SUMMARY_TEXT, page = PAGE)
 
+@app.route('/next', methods=['POST'])
+def next():
+	global SEARCH
+	global DATA
+	global ENTRY
+	global SUMMARY
+	global ARTICLE
+	global PAPERS
+	global PAGE
+	global ARTICLE
+	SEARCH = True
+	SUMMARY = False
+	PAGE += 5
+	return render_template("index.html", article=ARTICLE, search = SEARCH, data = DATA, search_entry = ENTRY, summary = SUMMARY, summary_text = SUMMARY_TEXT, page = PAGE)
 
-	# return render_template("index.html", search = True, data = formatted_data, search_entry = search)
+@app.route('/prev', methods=['POST'])
+def prev():
+	global SEARCH
+	global DATA
+	global ENTRY
+	global SUMMARY
+	global ARTICLE
+	global PAPERS
+	global PAGE
+	global ARTICLE
+	SEARCH = True
+	SUMMARY = False
+	PAGE -= 5
+	return render_template("index.html", article=ARTICLE, search = SEARCH, data = DATA, search_entry = ENTRY, summary = SUMMARY, summary_text = SUMMARY_TEXT, page = PAGE)
+
+	

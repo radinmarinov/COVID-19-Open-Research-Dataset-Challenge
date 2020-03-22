@@ -99,7 +99,7 @@ March 2020 - Nikhil Patel, Radin Marinov
 Search results for: {{search_entry}}
 
 <div id="results" align="left">
-  {% for i in range(5) %}
+  {% for i in range(page, page + 5) %}
     <div id = i>
     </br>
       <div class="demo-card-wide mdl-card mdl-shadow--2dp">
@@ -139,6 +139,22 @@ Search results for: {{search_entry}}
   </div>
 </div>
 
+{% endif %}
+
+{% if page == 0 %}
+  <form action="next" method='POST'>
+    <button type="submit" name = "next" class="btn-link">Next</button>
+  </form>
+{% endif %}
+{% if page != 0 %}
+  <form action="prev" method='POST'>
+    <button type="submit" name = "prev" class="btn-link">Previous</button>
+  </form>
+  {% if page < 95 %}
+  <form action="next" method='POST'>
+    <button type="submit" name = "next" class="btn-link">Next</button>
+  </form>
+  {% endif %}
 {% endif %}
 
 {% endif %}
