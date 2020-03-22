@@ -13,10 +13,30 @@
 
 <style>
 .demo-card-wide.mdl-card {
-  width: 75%;
+  width: 95%;
 }
 .demo-card-wide > .mdl-card__menu {
   color: #fff;
+}
+.column {
+  float: left;
+  width: 50%;
+}
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+.btn-link {
+    border: none;
+    outline: none;
+    background: none;
+    cursor: pointer;
+    color: #0000EE;
+    padding: 0;
+    text-decoration: underline;
+    font-family: inherit;
+    font-size: inherit;
 }
 </style>
 
@@ -35,7 +55,7 @@ March 2020 - Nikhil Patel, Radin Marinov
     <h4>
     COVID-19 Research Finder
     </h4>
-    <form method='POST'>
+    <form action="search" method='POST'>
   <div class="mdl-textfield mdl-js-textfield">
     <input class="mdl-textfield__input" type="text" name="keywords">
     <label class="mdl-textfield__label" for="sample1">Search</label>
@@ -57,7 +77,7 @@ March 2020 - Nikhil Patel, Radin Marinov
     COVID-19 Research Finder
     </h4>
 
-  <form method='POST'>
+  <form action="search" method='POST'>
   <div class="mdl-textfield mdl-js-textfield">
     <input class="mdl-textfield__input" type="text" name="keywords">
     <label class="mdl-textfield__label" for="sample1">Search</label>
@@ -71,20 +91,28 @@ March 2020 - Nikhil Patel, Radin Marinov
   {% endif %}
 </section>
 {% if search %}
+
+<div class="row">
+  <div class="column">
+  
+
 Search results for: {{search_entry}}
+
 <div id="results" align="left">
-  {% for paper in data %}
-    <div id = "{{paper[0]}}">
+  {% for i in range(5) %}
+    <div id = i>
     </br>
       <div class="demo-card-wide mdl-card mdl-shadow--2dp">
   
         <div class="mdl-card__supporting-text">
           
-            <font color="blue" size = "5">{{paper[0]}}</font>
+            <form action="summary" method='POST'>
+              <button type="submit" name = "link" value= {{i}} class="btn-link">{{data[i][0]}}</button>
+            </form>
           
         </div>
         <div class="mdl-card__actions mdl-card--border">
-            {{paper[1]}}
+            {{data[i][1]}}
         </div>
         
       </div>
@@ -92,6 +120,26 @@ Search results for: {{search_entry}}
     </div>
   {% endfor %}
 </div>
+
+{% if summary %}
+</div>
+  <div class="column">
+    <div class="demo-card-wide mdl-card mdl-shadow--2dp">
+  
+        <div class="mdl-card__supporting-text">
+          
+            <font>Summary</font>
+          
+        </div>
+        <div class="mdl-card__actions mdl-card--border">
+            {{summary_text}}
+        </div>
+        
+    </div>
+  </div>
+</div>
+
+{% endif %}
 
 {% endif %}
 

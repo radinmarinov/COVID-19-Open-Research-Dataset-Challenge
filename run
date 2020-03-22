@@ -1,0 +1,3 @@
+#!/bin/bash
+export FLASK_APP=research_search.py
+flask run
