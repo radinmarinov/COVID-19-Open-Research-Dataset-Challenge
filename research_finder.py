@@ -33,13 +33,18 @@ class ResearchFinder():
         self.sentence_similarity_dict = sentence_similarity_dict
         
     def store_data(self):
+        """
+        Pickle and store an instance of ResearchFinder
+        """
         research_finder_file = open('research_finder_file', 'ab') 
-      
-        # source, destination 
         pickle.dump(self, research_finder_file)                      
         research_finder_file.close() 
         
     def load_data(self, kaggle=False):
+        """
+        Load an instancec of ResearchFinder
+        Saves time over parsing through all json files when creating an instance
+        """
         if kaggle:
             research_finder_file = open('../input/research-finder-file/research_finder_file', 'rb')
         else:
@@ -53,6 +58,9 @@ class ResearchFinder():
         research_finder_file.close() 
             
     def add_to_vocab(self, word):
+        """
+        Add a word to the vocabulary of all json files
+        """
         self.vocab[word] = self.vocab.get(word, 0) + 1
         
     def json_parser(self, file_path):
@@ -102,7 +110,7 @@ class ResearchFinder():
         
     def get_data(self):
         """
-        Return all data in the form of a dataframe
+        Return all data from all papers in the form of a dataframe
         """
         if self.data is None:
             self.all_metadata = pd.read_csv("CORD-19-research-challenge/2020-03-13/all_sources_metadata_2020-03-13.csv"
@@ -123,11 +131,8 @@ class ResearchFinder():
                         'init_title': [],
                         'init_abstract': [], 
                         'init_body_text': [],
-                        
                         }
-            for i, file_path in enumerate(self.all_jsons):
-                if i % (len(self.all_jsons) // 10) == 0:
-                    print(f'Processing index: {i} of {len(self.all_jsons)}')
+            for file_path in self.all_jsons:
                 paper_data = self.json_parser(file_path)
                 data_dict['paper_id'].append(paper_data['paper_id'])
                 data_dict['title'].append(paper_data['title'])
@@ -137,6 +142,7 @@ class ResearchFinder():
                 data_dict['init_title'].append(paper_data['init_title'])
                 data_dict['init_abstract'].append(paper_data['init_abstract'])
                 data_dict['init_body_text'].append(paper_data['init_body_text'])
+            
             self.data = pd.DataFrame(data_dict, columns=['paper_id',
                                                          'title',
                                                          'abstract', 
@@ -154,6 +160,10 @@ class ResearchFinder():
         return self.data
     
     def find_paper(self, keywords):
+        """
+        Returns a dataframe of papers related to a list of input keywords using
+        TF-IDF for each keyword
+        """
         data = self.get_data()
         score = pd.Series(0, index=data.index)
         for keyword in keywords:
@@ -171,6 +181,10 @@ class ResearchFinder():
         return data[0:100]
     
     def get_citation_dict(self):
+        """
+        Returns a dictionary mapping every paper title to the amount of other papers
+        that reference that paper
+        """
         if self.citation_dict is None:
             citation_dict = {}
             data = self.get_data()
@@ -181,6 +195,9 @@ class ResearchFinder():
         return self.citation_dict
     
     def summarize_paper(self, paper_text, n_sentences):
+        """
+        Generates an n-sentence length summary of the body text of a paper
+        """
         self.sentence_similarity_dict = {}
         tokens = nltk.tokenize.sent_tokenize(paper_text)
         sentences = []
@@ -198,9 +215,9 @@ class ResearchFinder():
         stop_words.extend(custom_stop_words)
         summarize_text = []
         # Step 2 - Generate Similary Martix across sentences
-        sentence_similarity_martix = self.build_similarity_matrix(sentences, stop_words)
+        sentence_similarity_matrix = self.build_similarity_matrix(sentences, stop_words)
         # Step 3 - Rank sentences in similarity martix
-        sentence_similarity_graph = nx.from_numpy_array(sentence_similarity_martix)
+        sentence_similarity_graph = nx.from_numpy_array(sentence_similarity_matrix)
         scores = nx.pagerank(sentence_similarity_graph)
         # Step 4 - Sort the rank and pick top sentences
         ranked_sentence = sorted(((scores[i],s) for i,s in enumerate(sentences)), reverse=True)    
@@ -211,7 +228,10 @@ class ResearchFinder():
         #print("Summarize Text: \n", ". ".join(summarize_text))
         return "\n".join(summarize_text)
     
-    def sentence_similarity(self, sent1, sent2, stopwords_=None):    
+    def sentence_similarity(self, sent1, sent2, stopwords_=None):
+        """
+        Given two sentences, find their similarities using cosine distance
+        """
         vectors = self.sentence_similarity_dict.get(tuple(sent1 + sent2), None)
         
         if vectors is not None:
@@ -239,9 +259,14 @@ class ResearchFinder():
             self.sentence_similarity_dict[tuple(sent1 + sent2)] = (vector1, vector2)
             self.sentence_similarity_dict[tuple(sent2 + sent1)] = (vector2, vector1)
         
+        if sum(vector1) == 0 or sum(vector2) == 0:
+            return 0 
         return 1 - cosine_distance(vector1, vector2)
     
     def build_similarity_matrix(self, sentences, stop_words):
+        """
+        Given a list of sentences, build out a matrix of their similarities
+        """
         # Create an empty similarity matrix
         similarity_matrix = np.zeros((len(sentences), len(sentences)))
      
@@ -261,7 +286,8 @@ if __name__ == '__main__':
 #    data = rf.get_data()
 #    citation_dict = rf.get_citation_dict()
 #    rf.store_data()
-    test_papers = rf.find_paper(['coronavirus', 'risk', 'factor', 'covid'])
+    test_papers = rf.find_paper(['wuhan']).loc[:, ['init_title', 'init_abstract', 'init_body_text']]
     best_title = test_papers['init_title'].iloc[0]
+    best_abstract = test_papers['init_abstract'].iloc[0]
     summary = rf.summarize_paper(test_papers['init_body_text'].iloc[0], 7)
     
