@@ -19,6 +19,12 @@ def render():
 	global SUMMARY
 	global ARTICLE
 	global PAPERS
+	SEARCH = False
+	DATA = []
+	ENTRY = ""
+	SUMMARY = False
+	SUMMARY_TEXT = ""
+	PAPERS = []
 	return render_template("index.html", search = SEARCH, data = DATA, search_entry = ENTRY, summary = SUMMARY, summary_text = SUMMARY_TEXT)
 
 @app.route('/search', methods=['POST'])
