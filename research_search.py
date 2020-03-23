@@ -22,7 +22,6 @@ def render():
 	global ARTICLE
 	global PAPERS
 	global PAGE
-	global ARTICLE
 	SEARCH = False
 	DATA = []
 	ENTRY = ""
@@ -40,7 +39,6 @@ def search():
 	global ARTICLE
 	global PAPERS
 	global PAGE
-	global ARTICLE
 	SUMMARY = False
 	SEARCH = True
 	ENTRY = request.form['keywords']
@@ -62,7 +60,6 @@ def summary():
 	global ARTICLE
 	global PAPERS
 	global PAGE
-	global ARTICLE
 	SEARCH = True
 	SUMMARY = True
 	ARTICLE = request.form['link']
@@ -79,7 +76,6 @@ def next():
 	global ARTICLE
 	global PAPERS
 	global PAGE
-	global ARTICLE
 	SEARCH = True
 	SUMMARY = False
 	PAGE += 5
@@ -94,10 +90,21 @@ def prev():
 	global ARTICLE
 	global PAPERS
 	global PAGE
-	global ARTICLE
 	SEARCH = True
 	SUMMARY = False
 	PAGE -= 5
 	return render_template("index.html", search = SEARCH, data = DATA, search_entry = ENTRY, summary = SUMMARY, summary_text = SUMMARY_TEXT, page = PAGE)
 
+@app.route('/fulltext', methods=['POST'])
+def fulltext():
+	global SEARCH
+	global DATA
+	global ENTRY
+	global SUMMARY
+	global ARTICLE
+	global PAPERS
+	global PAGE
+	fullData = [PAPERS["init_title"].iloc[int(ARTICLE)], PAPERS["init_abstract"].iloc[int(ARTICLE)], PAPERS["init_body_text"].iloc[int(ARTICLE)]]
+	
+	return render_template("fulltext.html", data = fullData)
 	

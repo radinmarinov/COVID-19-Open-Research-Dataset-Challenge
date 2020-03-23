@@ -152,8 +152,15 @@
           <font>Summary of {{summary_text[0]}}</font>
         </div>
         <div class="mdl-card__actions mdl-card--border">
-          {{summary_text[1]}}
+          {% for s in summary_text[1] %}
+            <p>{{s}}</p>
+          {% endfor %}
         </div>
+        <form action="fulltext" method='POST' target="_blank">
+            <button type="submit" name = "next" target="_blank" class="btn-link">
+              Full Text
+            </button>
+          </form>
       </div>
     </div>
     {% endif %}

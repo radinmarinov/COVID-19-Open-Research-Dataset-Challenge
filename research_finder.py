@@ -226,6 +226,7 @@ class ResearchFinder():
             summarize_text.append(" ".join(ranked_sentence[i][1]))
         # Step 5 - Offcourse, output the summarize texr
         #print("Summarize Text: \n", ". ".join(summarize_text))
+        return summarize_text
         return "\n".join(summarize_text)
     
     def sentence_similarity(self, sent1, sent2, stopwords_=None):
