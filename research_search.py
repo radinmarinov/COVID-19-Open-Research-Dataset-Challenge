@@ -28,6 +28,7 @@ def render():
 	SUMMARY = False
 	SUMMARY_TEXT = ""
 	PAPERS = []
+	PAGE = 0
 	return render_template("index.html", search = SEARCH, data = DATA, search_entry = ENTRY, summary = SUMMARY, summary_text = SUMMARY_TEXT, page = PAGE)
 
 @app.route('/search', methods=['POST'])
@@ -45,6 +46,7 @@ def search():
 	keywords = ENTRY.split(" ")
 	PAPERS = rf.find_paper(keywords)
 	DATA = []
+	PAGE = 0
 	for x in range(0,100):
 		DATA.append([PAPERS["init_title"].iloc[x], "Abstract: " + PAPERS["init_abstract"].iloc[x][0:500] + "..."])
 
