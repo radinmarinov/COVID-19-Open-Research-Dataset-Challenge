@@ -50,7 +50,7 @@ def search():
 	for x in range(0,100):
 		DATA.append([PAPERS["init_title"].iloc[x], "Abstract: " + PAPERS["init_abstract"].iloc[x][0:500] + "..."])
 
-	return render_template("index.html", article=ARTICLE, search = SEARCH, data = DATA, search_entry = ENTRY, summary = SUMMARY, summary_text = SUMMARY_TEXT, page = PAGE)
+	return render_template("index.html", search = SEARCH, data = DATA, search_entry = ENTRY, summary = SUMMARY, summary_text = SUMMARY_TEXT, page = PAGE)
 
 
 @app.route('/summary', methods=['POST'])
@@ -66,9 +66,9 @@ def summary():
 	SEARCH = True
 	SUMMARY = True
 	ARTICLE = request.form['link']
-	SUMMARY_TEXT = rf.summarize_paper(PAPERS['init_body_text'].iloc[int(ARTICLE)], 7)
+	SUMMARY_TEXT = (DATA[int(ARTICLE)][0], rf.summarize_paper(PAPERS['init_body_text'].iloc[int(ARTICLE)], 7))
 
-	return render_template("index.html", article=ARTICLE, search = SEARCH, data = DATA, search_entry = ENTRY, summary = SUMMARY, summary_text = SUMMARY_TEXT, page = PAGE)
+	return render_template("index.html", search = SEARCH, data = DATA, search_entry = ENTRY, summary = SUMMARY, summary_text = SUMMARY_TEXT, page = PAGE)
 
 @app.route('/next', methods=['POST'])
 def next():
@@ -83,7 +83,7 @@ def next():
 	SEARCH = True
 	SUMMARY = False
 	PAGE += 5
-	return render_template("index.html", article=ARTICLE, search = SEARCH, data = DATA, search_entry = ENTRY, summary = SUMMARY, summary_text = SUMMARY_TEXT, page = PAGE)
+	return render_template("index.html", search = SEARCH, data = DATA, search_entry = ENTRY, summary = SUMMARY, summary_text = SUMMARY_TEXT, page = PAGE)
 
 @app.route('/prev', methods=['POST'])
 def prev():
@@ -98,6 +98,6 @@ def prev():
 	SEARCH = True
 	SUMMARY = False
 	PAGE -= 5
-	return render_template("index.html", article=ARTICLE, search = SEARCH, data = DATA, search_entry = ENTRY, summary = SUMMARY, summary_text = SUMMARY_TEXT, page = PAGE)
+	return render_template("index.html", search = SEARCH, data = DATA, search_entry = ENTRY, summary = SUMMARY, summary_text = SUMMARY_TEXT, page = PAGE)
 
 	

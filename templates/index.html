@@ -2,166 +2,166 @@
 
 <html>
 <head>
-<link href="{{ url_for('static', filename='webcodestyle.css') }}" rel="stylesheet" type="text/css"/>
-<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-<link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css">
-<script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js" type="text/javascript"> </script>
-<link href="https://unpkg.com/material-components-web@v4.0.0/dist/material-components-web.min.css" rel="stylesheet">
-<script src="https://unpkg.com/material-components-web@v4.0.0/dist/material-components-web.min.js"></script>
-
-
-<style>
-.demo-card-wide.mdl-card {
-  width: 95%;
-}
-.demo-card-wide > .mdl-card__menu {
-  color: #fff;
-}
-.column {
-  float: left;
-  width: 50%;
-}
-.row:after {
-  content: "";
-  display: table;
-  clear: both;
-}
-.btn-link {
-    border: none;
-    outline: none;
-    background: none;
-    cursor: pointer;
-    color: #0000EE;
-    padding: 0;
-    text-decoration: underline;
-    font-family: inherit;
-    font-size: inherit;
-}
-</style>
-
-
+  <link href="{{ url_for('static', filename='webcodestyle.css') }}" rel="stylesheet" type="text/css"/>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css">
+  <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js" type="text/javascript"> </script>
+  <link href="https://unpkg.com/material-components-web@v4.0.0/dist/material-components-web.min.css" rel="stylesheet">
+  <script src="https://unpkg.com/material-components-web@v4.0.0/dist/material-components-web.min.js"></script>
+  <style>
+    .demo-card-wide.mdl-card {
+      width: 95%;
+    }
+    .demo-card-wide > .mdl-card__menu {
+      color: #fff;
+    }
+    .column {
+      float: left;
+      width: 50%;
+    }
+    .row:after {
+      content: "";
+      display: table;
+      clear: both;
+    }
+    .btn-link {
+      border: none;
+      outline: none;
+      background: none;
+      cursor: pointer;
+      color: #0000EE;
+      padding: 0;
+      text-decoration: underline;
+      font-family: inherit;
+      font-size: inherit;
+      align-content: left;
+      text-align: left;
+    }
+  </style>
 </head>
+
 <body>
-March 2020 - Nikhil Patel, Radin Marinov
-<section>
-  {% if search == false %}
-  </br>
-  </br>
-  </br>
-  </br>
-  </br>
-  <center>
+  <section>
+    {% if search == false %}
+    </br>
+    </br>
+    </br>
+    </br>
+    </br>
+    <center>
+      <h4>
+        COVID-19 Research Finder
+      </h4>
+      <form action="search" method='POST'>
+        <div class="mdl-textfield mdl-js-textfield">
+          <input class="mdl-textfield__input" type="text" name="keywords">
+          <label class="mdl-textfield__label" for="sample1">Search</label>
+        </div>
+        <button class="mdl-button mdl-js-button mdl-button--fab mdl-button--colored">
+          <i class="material-icons">search</i>
+        </button>
+      </form>
+      </br>
+    </center>
+    {% endif %}
+    {% if search %}
+    </br>
     <h4>
-    COVID-19 Research Finder
+      COVID-19 Research Finder
     </h4>
     <form action="search" method='POST'>
-  <div class="mdl-textfield mdl-js-textfield">
-    <input class="mdl-textfield__input" type="text" name="keywords">
-    <label class="mdl-textfield__label" for="sample1">Search</label>
-  </div>
-  <button class="mdl-button mdl-js-button mdl-button--fab mdl-button--colored">
-      <i class="material-icons">search</i>
-  </button>
-  </form>
-  </br>
-  </center>
-
-  
-  
-  {% endif %}
-  
-  {% if search %}
-  </br>
-    <h4>
-    COVID-19 Research Finder
-    </h4>
-
-  <form action="search" method='POST'>
-  <div class="mdl-textfield mdl-js-textfield">
-    <input class="mdl-textfield__input" type="text" name="keywords">
-    <label class="mdl-textfield__label" for="sample1">Search</label>
-  </div>
-  <button class="mdl-button mdl-js-button mdl-button--fab mdl-button--colored">
-      <i class="material-icons">search</i>
-  </button>
-  </form>
-  </br>
-  
-  {% endif %}
-</section>
-{% if search %}
-
-<div class="row">
-  <div class="column">
-  
-
-Search results for: {{search_entry}}
-
-<div id="results" align="left">
-  {% for i in range(page, page + 5) %}
-    <div id = i>
-    </br>
-      <div class="demo-card-wide mdl-card mdl-shadow--2dp">
-  
-        <div class="mdl-card__supporting-text">
-          
-            <form action="summary" method='POST'>
-              <button type="submit" name = "link" value= {{i}} class="btn-link">{{data[i][0]}}</button>
-            </form>
-          
-        </div>
-        <div class="mdl-card__actions mdl-card--border">
-            {{data[i][1]}}
-        </div>
-        
+      <div class="mdl-textfield mdl-js-textfield">
+        <input class="mdl-textfield__input" type="text" name="keywords">
+        <label class="mdl-textfield__label" for="sample1">Search</label>
       </div>
+      <button class="mdl-button mdl-js-button mdl-button--fab mdl-button--colored">
+        <i class="material-icons">search</i>
+      </button>
+    </form>
     </br>
+    {% endif %}
+  </section>
+  {% if search %}
+  <div class="row">
+    <div class="column">
+      Search results for: {{search_entry}}
+      <div id="results" align="left">
+        {% for i in range(page, page + 5) %}
+        <div id = i>
+          </br>
+          <div class="demo-card-wide mdl-card mdl-shadow--2dp">
+            <div class="mdl-card__supporting-text">
+              <form action="summary" method='POST'>
+                <button type="submit" name = "link" value= {{i}} class="btn-link">
+                  <font size = "4" align="left">
+                    {{data[i][0]}}
+                  </font>
+                </button>
+              </form>
+            </div>
+            <div class="mdl-card__actions mdl-card--border">
+              {{data[i][1]}}
+            </div>
+          </div>
+          </br>
+        </div>
+        {% endfor %}
+      </div>
+      {% if page == 0 %}
+      <div class="row">
+        <div class="column">
+          </br>
+        </div>
+        <div class = "column">
+          <form action="next" method='POST'>
+            <button type="submit" name = "next" class="btn-link">
+              <i class="material-icons">arrow_forward</i>
+            </button>
+          </form>
+        </div>
+      </div>
+      {% endif %}
+      {% if page != 0 %}
+      <div class="row">
+        <div class="column">
+          <form action="prev" method='POST'>
+            <button type="submit" name = "prev" class="btn-link">
+              <i class="material-icons">arrow_back</i>
+            </button>
+          </form>
+        </div>
+        {% if page < 95 %}
+        <div class="column">
+          <form action="next" method='POST'>
+            <button type="submit" name = "next" class="btn-link">
+              <i class="material-icons">arrow_forward</i>
+            </button>
+          </form>
+        </div>
+      </div>
+      {% endif %}
+      {% endif %}
+      </br>
+      </br>
     </div>
-  {% endfor %}
-</div>
-
-{% if summary %}
-</div>
-  <div class="column">
-    <div class="demo-card-wide mdl-card mdl-shadow--2dp">
-  
+    {% if summary %}
+    <div class="column">
+      <div class="demo-card-wide mdl-card mdl-shadow--2dp">
         <div class="mdl-card__supporting-text">
-          
-            <font>Summary</font>
-          
+          <font>Summary of {{summary_text[0]}}</font>
         </div>
         <div class="mdl-card__actions mdl-card--border">
-            {{summary_text}}
+          {{summary_text[1]}}
         </div>
-        
+      </div>
     </div>
+    {% endif %}
   </div>
-</div>
-
-{% endif %}
-
-{% if page == 0 %}
-  <form action="next" method='POST'>
-    <button type="submit" name = "next" class="btn-link">Next</button>
-  </form>
-{% endif %}
-{% if page != 0 %}
-  <form action="prev" method='POST'>
-    <button type="submit" name = "prev" class="btn-link">Previous</button>
-  </form>
-  {% if page < 95 %}
-  <form action="next" method='POST'>
-    <button type="submit" name = "next" class="btn-link">Next</button>
-  </form>
   {% endif %}
-{% endif %}
-
-{% endif %}
-
-
-
-
-
+  <center>
+    <p>Nikhil Patel & Radin Marinov</p>
+    <p>COVID-19 Open Research Dataset Challenge 2020</p>
+  </center>
 </body>
 </html>
